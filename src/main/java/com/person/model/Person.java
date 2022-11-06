@@ -1,22 +1,25 @@
 package com.person.model;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Set;
 
 @Entity
 @Table(name = "person")
 public class Person {
 
     @Id // Technical ID used as table primary key and used in relations
-    @GeneratedValue(strategy = GenerationType.AUTO)
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
-//    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-//    @GenericGenerator(name = "native", strategy = "native")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
     /*
@@ -37,8 +40,18 @@ public class Person {
     private LocalDate birthDate;
 
     @ManyToOne
-    @JoinColumn(name = "favourite_color_id")
+    @JoinColumn(name = "favourite_colour_id")
     private Colour favouriteColor;
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "person_hobby",
+            joinColumns = @JoinColumn(name = "person_id"),
+            inverseJoinColumns = @JoinColumn(name = "hobby_id")
+    )
+    private Set<Hobby> hobbies = new HashSet<>();
 
     public Person() {
         // Default Constructor for JPA Entity class
@@ -48,7 +61,7 @@ public class Person {
 
     @PrePersist
     private void setPersonId() {
-        ref = UUID.randomUUID().toString();
+        ref = RandomStringUtils.randomAlphanumeric(8);
     }
 
     public Long getId() {
@@ -95,9 +108,27 @@ public class Person {
         this.favouriteColor = favouriteColor;
     }
 
+    public Set<Hobby> getHobbies() {
+        return hobbies;
+    }
+
+    public Set<String> getHobbyNames() {
+        Set<String> hobbyNames = new HashSet<>();
+        hobbies.forEach(c -> hobbyNames.add(c.getHobbyName()));
+        return hobbyNames;
+    }
+
+    public Object[] getHobbiesAsArray() {
+        return hobbies.toArray();
+    }
+
+    public void setHobbies(Set<Hobby> hobbies) {
+        this.hobbies = hobbies;
+    }
+
     /*
-        Java Doc for ....
-     */
+            Java Doc for ....
+         */
     public long getAge(LocalDate referenceDate) {
         if (birthDate == null) {
             return 0;

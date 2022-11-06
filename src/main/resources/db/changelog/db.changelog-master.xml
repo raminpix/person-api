@@ -8,4 +8,5 @@
 
     <!-- All the changelogs that have to be applied by liquibase in main context -->
     <include file="db/changelog/db.changelog-V.0.0.1-1.xml"/>
+    <include file="db/changelog/db.changelog-V.0.0.1-2.xml"/>
 </databaseChangeLog>

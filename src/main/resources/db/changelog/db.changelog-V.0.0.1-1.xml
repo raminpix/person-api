@@ -20,7 +20,7 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="ref" type="VARCHAR(16)">
+            <column name="ref" type="VARCHAR(8)">
                 <constraints uniqueConstraintName="idx_ref_person" unique="true" nullable="false"/>
             </column>
             <column name="first_name" type="VARCHAR(20)">
@@ -32,7 +32,7 @@
             <column name="birth_date" type="datetime">
                 <constraints nullable="false"/>
             </column>
-            <column name="color_id" type="BIGINT">
+            <column name="favourite_colour_id" type="BIGINT">
                 <constraints referencedTableName="colour" referencedColumnNames="id" foreignKeyName="fk_colour_id" />
             </column>
         </createTable>
