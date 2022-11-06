@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+    
+    <changeSet author="Ramin(raminpix)" id="V.0.0.1-1">
+
+        <createTable tableName="colour">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="colour_name" type="VARCHAR(15)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="person">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="ref" type="VARCHAR(16)">
+                <constraints uniqueConstraintName="idx_ref_person" unique="true" nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birth_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color_id" type="BIGINT">
+                <constraints referencedTableName="colour" referencedColumnNames="id" foreignKeyName="fk_colour_id" />
+            </column>
+        </createTable>
+
+        <createTable tableName="hobby">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="hobby_name" type="VARCHAR(30)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="person_hobby">
+            <column name="person_id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="hobby_id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,22 +1,31 @@
 package com.person.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Column;
+import org.hibernate.annotations.NaturalId;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "person")
 public class Person {
 
-    @Id
+    @Id // Technical ID used as table primary key and used in relations
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
+//    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+//    @GenericGenerator(name = "native", strategy = "native")
     private Long id;
+
+    /*
+     Since the technical ID (id) is sequential and predictable and is not secure, ref will be used
+     as an identifier (Natural ID) for communication outside the API.
+    */
+    @NaturalId
+    @Column(name = "ref", nullable = false, unique = true, length = 8)
+    private String ref;
 
     @Column(name = "first_name", nullable = false, length = 20)
     private String firstName;
@@ -27,7 +36,19 @@ public class Person {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
+    @ManyToOne
+    @JoinColumn(name = "favourite_color_id")
+    private Colour favouriteColor;
+
     public Person() {
+        // Default Constructor for JPA Entity class
+    }
+
+    // TODO : Equals and HashCode !
+
+    @PrePersist
+    private void setPersonId() {
+        ref = UUID.randomUUID().toString();
     }
 
     public Long getId() {
@@ -36,6 +57,10 @@ public class Person {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getRef() {
+        return ref;
     }
 
     public String getFirstName() {
@@ -62,11 +87,22 @@ public class Person {
         this.birthDate = birthDate;
     }
 
+    public Colour getFavouriteColor() {
+        return favouriteColor;
+    }
+
+    public void setFavouriteColor(Colour favouriteColor) {
+        this.favouriteColor = favouriteColor;
+    }
+
+    /*
+        Java Doc for ....
+     */
     public long getAge(LocalDate referenceDate) {
         if (birthDate == null) {
             return 0;
-        } else {
-            return ChronoUnit.YEARS.between(birthDate, referenceDate);
         }
+        // If referenceDate is null, calculates age based on the currentDate
+        return ChronoUnit.YEARS.between(birthDate, Objects.requireNonNullElseGet(referenceDate, LocalDate::now));
     }
 }
