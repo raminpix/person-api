@@ -1,8 +1,17 @@
 # Person REST API Sample Application
 
-## How to test
+This sample application uses H2 in-memory database to operate.
+
+For running the application rubn the following command:
+
+And use the postman collection in the repository.
+
+Note: replace {ref} by person ref value in the postman.
 
 
-## How to deploy
+# Improvements:
 
+- Add unit and integration tests
+- Add Environment variables to Postman to automate the testing process
+- Add Security
 
