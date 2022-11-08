@@ -15,13 +15,11 @@ class PersonModelTest {
         //Given
         Person person = new Person();
 
-        //Now represents the startDate of calculating age to execute the tests without dependency on currentDate
-        LocalDate now = LocalDate.of(2022,11,5);
-
         //When
         person.setBirthDate(LocalDate.of(1986,9,1));
 
         //Then
-        assertEquals(person.getAge(now), 36);
+        // TODO : Use hamcrest
+        assertEquals(person.getAge(), 36);
     }
 }

@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -39,14 +38,15 @@ public class Person {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "favourite_colour_id")
-    private Colour favouriteColor;
+    private Colour favouriteColour;
 
-    @ManyToMany(cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
     @JoinTable(name = "person_hobby",
             joinColumns = @JoinColumn(name = "person_id"),
             inverseJoinColumns = @JoinColumn(name = "hobby_id")
@@ -56,8 +56,6 @@ public class Person {
     public Person() {
         // Default Constructor for JPA Entity class
     }
-
-    // TODO : Equals and HashCode !
 
     @PrePersist
     private void setPersonId() {
@@ -100,12 +98,12 @@ public class Person {
         this.birthDate = birthDate;
     }
 
-    public Colour getFavouriteColor() {
-        return favouriteColor;
+    public Colour getFavouriteColour() {
+        return favouriteColour;
     }
 
-    public void setFavouriteColor(Colour favouriteColor) {
-        this.favouriteColor = favouriteColor;
+    public void setFavouriteColour(Colour favouriteColour) {
+        this.favouriteColour = favouriteColour;
     }
 
     public Set<Hobby> getHobbies() {
@@ -129,11 +127,13 @@ public class Person {
     /*
             Java Doc for ....
          */
-    public long getAge(LocalDate referenceDate) {
+    @Column(name = "age")
+    @Transient
+    public long getAge() {
         if (birthDate == null) {
             return 0;
         }
         // If referenceDate is null, calculates age based on the currentDate
-        return ChronoUnit.YEARS.between(birthDate, Objects.requireNonNullElseGet(referenceDate, LocalDate::now));
+        return ChronoUnit.YEARS.between(birthDate, LocalDate.now());
     }
 }

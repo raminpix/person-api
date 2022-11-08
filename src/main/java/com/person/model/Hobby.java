@@ -18,8 +18,6 @@ public class Hobby {
         // Default Constructor for JPA Entity class
     }
 
-    // TODO : Equals and HashCode !
-
     public Long getId() {
         return id;
     }

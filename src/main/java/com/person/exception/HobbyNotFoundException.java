@@ -1,4 +1,4 @@
 package com.person.exception;
 
-public class HobbyNotFoundException extends RuntimeException {
+public class HobbyNotFoundException extends ResourceNotFoundException {
 }
