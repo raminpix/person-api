@@ -18,6 +18,21 @@ public class Colour {
         // Default Constructor for JPA Entity class
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Colour colour = (Colour) o;
+
+        return colourName.equals(colour.colourName);
+    }
+
+    @Override
+    public int hashCode() {
+        return colourName.hashCode();
+    }
+
     public Long getId() {
         return id;
     }

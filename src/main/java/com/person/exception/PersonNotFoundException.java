@@ -1,7 +1,8 @@
 package com.person.exception;
 
 public class PersonNotFoundException extends ResourceNotFoundException {
-    public PersonNotFoundException() {
-        super("Person not found");
+
+    public PersonNotFoundException(String message) {
+        super(message);
     }
 }

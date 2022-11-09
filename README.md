@@ -1,17 +1,23 @@
 # Person REST API Sample Application
 
-This sample application uses H2 in-memory database to operate.
+## Pre-requirements:
 
-For running the application rubn the following command:
+- Java JDK 17.0.3.1 or higher
+- Apache Maven 3.6.3 or higher
+- Postman (For testing REST APIs)
 
-And use the postman collection in the repository.
+## Application Deployment
+This sample application uses an internal H2 in-memory database and there is no need to use an external RDBMS. 
+ 
+For deploying the application run the following command:
+mvn clean compile spring-boot:run
 
-Note: replace {ref} by person ref value in the postman.
+## How to Test
 
+There is Postman collection file in `tests` directory (`PersonAPI.postman_collection.json`)
 
-# Improvements:
+Import that file into Postman to test the APIs 
 
-- Add unit and integration tests
-- Add Environment variables to Postman to automate the testing process
-- Add Security
+It is possible to test each request individually or to run all API tests as `Run collection` in Postman. 
+There are assertions to ensure that HTTP status codes are as expected. 
 

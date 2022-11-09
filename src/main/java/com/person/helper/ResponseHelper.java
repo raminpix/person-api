@@ -1,41 +1,20 @@
 package com.person.helper;
 
 import com.person.dto.JSONResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 
-@Slf4j
 public class ResponseHelper {
 
-    public static ResponseEntity<JSONResponse> ok(String message, StringBuffer requestUri, Object data) {
-        String uri = requestUri.toString();
-        JSONResponse jsonResponse = new JSONResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), message, uri, data);
-        return ResponseEntity.ok(jsonResponse);
+    private ResponseHelper() {
+        throw new IllegalStateException("Creating instance of this class in not allowed.");
     }
 
     public static ResponseEntity<JSONResponse> ok(Object data) {
         JSONResponse jsonResponse = new JSONResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), null, null, data);
         return ResponseEntity.ok(jsonResponse);
-    }
-
-    public static ResponseEntity<JSONResponse> ok(String message, Object data) {
-        JSONResponse jsonResponse = new JSONResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), message, null, data);
-        return ResponseEntity.ok(jsonResponse);
-    }
-
-    public static ResponseEntity<JSONResponse> ok(String message, StringBuffer requestUri) {
-        String uri = requestUri.toString();
-        JSONResponse jsonResponse = new JSONResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), message, uri, null);
-        return ResponseEntity.ok(jsonResponse);
-    }
-
-    public static ResponseEntity<JSONResponse> created(String message, StringBuffer requestUri) {
-        String uri = requestUri.toString();
-        JSONResponse jsonResponse = new JSONResponse(HttpStatus.CREATED.value(), HttpStatus.CREATED.getReasonPhrase(), message, uri, null);
-        return ResponseEntity.created(URI.create(uri)).body(jsonResponse);
     }
 
     public static ResponseEntity<JSONResponse> created(String message, String resourceId, StringBuffer requestUri, Object data) {
@@ -60,14 +39,13 @@ public class ResponseHelper {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(jsonResponse);
     }
 
-    public static ResponseEntity deleted(String message) {
-        log.info("Resource deleted: " + message);
+    public static ResponseEntity deleted() {
         return ResponseEntity.noContent().build();
     }
 
     public static ResponseEntity<JSONResponse> notFound(String message) {
-        log.info("Resource not found: " + message);
-        return ResponseEntity.notFound().build();
+        JSONResponse jsonResponse = new JSONResponse(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase(), message, null, null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
     }
 
     public static ResponseEntity<JSONResponse> internalError(String message) {

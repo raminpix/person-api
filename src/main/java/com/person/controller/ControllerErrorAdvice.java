@@ -7,6 +7,8 @@ import com.person.helper.ResponseHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -33,6 +35,19 @@ public class ControllerErrorAdvice {
     public ResponseEntity<JSONResponse> handleException(DataIntegrityViolationException exception, HttpServletRequest request) {
         log.warn(exception.getMessage());
         return ResponseHelper.badRequest("Unable to perform operation due to data integrity violation.");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<JSONResponse> handleException(MethodArgumentNotValidException exception, HttpServletRequest request) {
+        log.warn(exception.getMessage());
+        return ResponseHelper.badRequest("Unable to perform operation due to invalid data.");
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<JSONResponse> handleException(HttpMessageNotReadableException exception, HttpServletRequest request) {
+        exception.printStackTrace();
+        log.warn(exception.getMessage());
+        return ResponseHelper.badRequest("Unable to read HTTP Message");
     }
 
     @ExceptionHandler(Exception.class)

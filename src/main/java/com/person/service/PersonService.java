@@ -3,69 +3,55 @@ package com.person.service;
 import com.person.dto.CreatePersonRequest;
 import com.person.dto.PersonResponse;
 import com.person.dto.UpdatePersonRequest;
-import com.person.exception.ColourNotFoundException;
-import com.person.exception.HobbyNotFoundException;
 import com.person.exception.PersonNotFoundException;
 import com.person.mapper.PersonMapper;
-import com.person.model.Colour;
-import com.person.model.Hobby;
 import com.person.model.Person;
-import com.person.repository.ColourRepository;
-import com.person.repository.HobbyRepository;
 import com.person.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Set;
 
 @Service
-@Log
 @RequiredArgsConstructor
 public class PersonService {
 
     private final PersonRepository personRepository;
-    private final ColourRepository colourRepository;
-    private final HobbyRepository hobbyRepository;
     private final PersonMapper personMapper;
+
+    private static final String PERSON_NOT_FOUND_MESSAGE = "Person with ref %s not found.";
 
     @Transactional
     public PersonResponse createPerson(CreatePersonRequest createPersonRequest) {
-        Person person = personMapper.toPerson(createPersonRequest);
-        Colour colour = colourRepository.findByColourName(createPersonRequest.favouriteColour()).orElseThrow(ColourNotFoundException::new);
-        person.setFavouriteColour(colour);
-        Set<Hobby> hobbies = hobbyRepository.findByHobbyNameIn(Set.of(createPersonRequest.hobbies())).orElseThrow(HobbyNotFoundException::new);
-        person.setHobbies(hobbies);
+        Person person = personMapper.updateExistingPerson(createPersonRequest);
         Person createdPerson = personRepository.save(person);
         return personMapper.toPersonResponse(createdPerson);
     }
 
+    @Transactional(readOnly = true)
     public List<PersonResponse> getPersons() {
         return personMapper.toPersonResponseList(personRepository.getAllPersons());
     }
 
+    @Transactional(readOnly = true)
     public PersonResponse getPerson(String ref) {
-        Person person = personRepository.findByRef(ref).orElseThrow(PersonNotFoundException::new);
+        Person person = personRepository.findByRef(ref).orElseThrow(() -> new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, ref)));
         return personMapper.toPersonResponse(person);
     }
 
+    @Transactional
     public PersonResponse updatePerson(String ref, UpdatePersonRequest updatePersonRequest) {
-        Person person = personRepository.findByRef(ref).orElseThrow(PersonNotFoundException::new);
-        person.setFirstName(updatePersonRequest.firstName());
-        person.setLastName(updatePersonRequest.lastName());
-        person.setBirthDate(updatePersonRequest.birthDate());
-        Colour colour = colourRepository.findByColourName(updatePersonRequest.favouriteColour()).orElseThrow(ColourNotFoundException::new);
-        person.setFavouriteColour(colour);
-        Set<Hobby> hobbies = hobbyRepository.findByHobbyNameIn(Set.of(updatePersonRequest.hobbies())).orElseThrow(HobbyNotFoundException::new);
-        person.setHobbies(hobbies);
+        Person person = personRepository.findByRef(ref).orElseThrow(() -> new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, ref)));
+        personMapper.updateExistingPerson(updatePersonRequest, person);
         Person updatedPerson = personRepository.save(person);
         return personMapper.toPersonResponse(updatedPerson);
     }
 
+    @Transactional
     public void deletePerson(String ref) {
-        Person person = personRepository.findByRef(ref).orElseThrow(PersonNotFoundException::new);
+        Person person = personRepository.findByRef(ref).orElseThrow(() -> new PersonNotFoundException(String.format(PERSON_NOT_FOUND_MESSAGE, ref)));
         personRepository.delete(person);
     }
+
 }

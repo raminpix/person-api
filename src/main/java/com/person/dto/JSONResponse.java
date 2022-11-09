@@ -1,7 +1,6 @@
 package com.person.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
 
 import java.io.Serializable;
 

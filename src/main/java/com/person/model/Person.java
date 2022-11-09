@@ -15,7 +15,6 @@ import java.util.Set;
 public class Person {
 
     @Id // Technical ID used as table primary key and used in relations
-//    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
@@ -57,8 +56,23 @@ public class Person {
         // Default Constructor for JPA Entity class
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Person person = (Person) o;
+
+        return ref.equals(person.ref);
+    }
+
+    @Override
+    public int hashCode() {
+        return ref.hashCode();
+    }
+
     @PrePersist
-    private void setPersonId() {
+    private void setRefBeforePersist() {
         ref = RandomStringUtils.randomAlphanumeric(8);
     }
 

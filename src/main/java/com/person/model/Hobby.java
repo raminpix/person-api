@@ -18,6 +18,21 @@ public class Hobby {
         // Default Constructor for JPA Entity class
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Hobby hobby = (Hobby) o;
+
+        return hobbyName.equals(hobby.hobbyName);
+    }
+
+    @Override
+    public int hashCode() {
+        return hobbyName.hashCode();
+    }
+
     public Long getId() {
         return id;
     }
