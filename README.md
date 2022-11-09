@@ -7,10 +7,11 @@
 - Postman (For testing REST APIs)
 
 ## Application Deployment
-This sample application uses an internal H2 in-memory database and there is no need to use an external RDBMS. 
+This sample application uses an **internal H2 in-memory database** and there is no need to use an external RDBMS. 
  
 For deploying the application run the following command:
-mvn clean compile spring-boot:run
+
+`mvn clean compile spring-boot:run`
 
 ## How to Test
 
