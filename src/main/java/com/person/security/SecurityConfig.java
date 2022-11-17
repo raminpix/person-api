@@ -8,18 +8,24 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Value("${auth0.audience}")
@@ -41,16 +47,9 @@ public class SecurityConfig {
                 .and()
                 .oauth2ResourceServer()
                 .jwt()
-                .decoder(jwtDecoder());
+                .decoder(jwtDecoder())
+                .jwtAuthenticationConverter(jwtAuthenticationConverter());
         return http.build();
-    }
-
-
-    // In non-secured profile, all the requests are passed and the security is ignored completely.
-    @Bean
-    @Profile("non-secured")
-    public WebSecurityCustomizer ignoreSecurityForAllRequests() {
-        return web -> web.ignoring().anyRequest();
     }
 
     CorsConfigurationSource corsConfigurationSource() {
@@ -75,5 +74,34 @@ public class SecurityConfig {
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuer);
         jwtDecoder.setJwtValidator(validator);
         return jwtDecoder;
+    }
+
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthoritiesClaimName("permissions");
+        converter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtConverter;
+    }
+
+    // In non-secured profile, all the requests are ignored for security.
+    @Bean
+    @Profile("non-secured")
+    public WebSecurityCustomizer ignoreSecurityForAllRequests() {
+        return web -> web.ignoring().anyRequest();
+    }
+
+    // In non-secured profile, all the authorities are granted. (For passing @PreAuthorize on PersonController methods)
+    @Bean
+    @Profile("non-secured")
+    public AnonymousAuthenticationFilter createAnonymousAuthenticationFilter() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("create:persons"));
+        authorities.add(new SimpleGrantedAuthority("update:persons"));
+        authorities.add(new SimpleGrantedAuthority("read:persons"));
+        authorities.add(new SimpleGrantedAuthority("delete:persons"));
+        return new AnonymousAuthenticationFilter("anonymous", "guest", authorities);
     }
 }

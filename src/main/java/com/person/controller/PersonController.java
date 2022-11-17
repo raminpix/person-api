@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,26 +26,29 @@ public class PersonController {
     private final PersonService personService;
 
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('create:persons')")
     public ResponseEntity<JSONResponse> createPerson(@RequestBody @Valid CreatePersonRequest createPersonRequest, HttpServletRequest request) {
         PersonResponse personResponse = personService.createPerson(createPersonRequest);
         String personRef = personResponse.ref();
         log.info("Person created. Ref: {}", personRef);
         return ResponseHelper.created("Person created.", personRef, request.getRequestURL(), personResponse);
-
     }
 
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('read:persons')")
     public ResponseEntity<JSONResponse> getPersons() {
         List<PersonResponse> persons = personService.getPersons();
         return ResponseHelper.ok(persons);
     }
 
     @GetMapping(path = "/{ref}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('read:persons')")
     public ResponseEntity<JSONResponse> getPersonByRef(@PathVariable String ref) {
         return ResponseHelper.ok(personService.getPerson(ref));
     }
 
     @PutMapping(path = "/{ref}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('update:persons')")
     public ResponseEntity<JSONResponse> updatePersonByRef(@PathVariable String ref, @RequestBody @Valid UpdatePersonRequest updatePersonRequest) {
         PersonResponse personResponse = personService.updatePerson(ref, updatePersonRequest);
         log.info("Person updated. Ref: {}", ref);
@@ -52,6 +56,7 @@ public class PersonController {
     }
 
     @DeleteMapping(path = "/{ref}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('delete:persons')")
     public ResponseEntity<JSONResponse> deletePersonByRef(@PathVariable String ref) {
         personService.deletePerson(ref);
         log.info("Person deleted. Ref: {}", ref);

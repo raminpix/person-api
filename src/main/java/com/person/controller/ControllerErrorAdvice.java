@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,12 @@ public class ControllerErrorAdvice {
     public ResponseEntity<JSONResponse> handleException(ResourceNotFoundException exception, HttpServletRequest request) {
         log.warn(exception.getMessage());
         return ResponseHelper.notFound(exception.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<JSONResponse> handleException(AccessDeniedException exception, HttpServletRequest request) {
+        log.warn(exception.getMessage());
+        return ResponseHelper.forbidden(exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
